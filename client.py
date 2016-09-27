@@ -4,10 +4,6 @@ This file is used to:
     1. receive image data from torcs
     2. store data in hdf5 format
 
-Reqiured file:
-    1. client.py
-    2. torcs_data_pb2.py
-
 Last modified: 2016-09-27: 20:31
 '''
 import zmq

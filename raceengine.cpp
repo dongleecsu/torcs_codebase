@@ -40,9 +40,6 @@
 #include "raceengine.h"
 
 ////////////////// added by lidong 
-// #include <zmq.hpp> 
-// #include <iostream> 
-// #include "torcs_data.pb.h"
 #define image_width 640
 #define image_height 480
 ////////////////// added by lidong
@@ -623,67 +620,8 @@ ReRaceRules(tCarElt *car)
 extern int* pwritten;
 extern uint8_t* pdata;
 extern int* ppause;
-// extern double* psteer_angle;
 extern int* pzmq_flag;
 extern int* psave_flag;
-
-extern double* psteerCmd_ghost;
-extern double* paccelCmd_ghost;
-extern double* pbrakeCmd_ghost;
-
-extern double* pspeed_ghost;
-extern double* ptoMiddle_ghost;
-extern double* pangle_ghost;
-
-extern double* pfast_ghost;
-
-extern double* pdist_L_ghost;
-extern double* pdist_R_ghost;
-
-extern double* ptoMarking_L_ghost;
-extern double* ptoMarking_M_ghost;
-extern double* ptoMarking_R_ghost;
- 
-extern double* pdist_LL_ghost;
-extern double* pdist_MM_ghost;
-extern double* pdist_RR_ghost;
-
-extern double* ptoMarking_LL_ghost;
-extern double* ptoMarking_ML_ghost;
-extern double* ptoMarking_MR_ghost;
-extern double* ptoMarking_RR_ghost;
-
-// static zmq::context_t context(1);
-// static zmq::socket_t socket(context, ZMQ_REP);
-
-// uint8_t image[image_width*image_height * 3];
-// TorcsData torcs_data;
-
-double* psteerCmd=NULL;
-double* paccelCmd=NULL;
-double* pbrakeCmd=NULL;
-
-double* pspeed=NULL;
-double* ptoMiddle=NULL;
-double* pangle=NULL;
-
-double* pfast=NULL;
-
-double* pdist_L=NULL;
-double* pdist_R=NULL;
-
-double* ptoMarking_L=NULL;
-double* ptoMarking_M=NULL;
-double* ptoMarking_R=NULL;
-
-double* pdist_LL=NULL;
-double* pdist_MM=NULL;
-double* pdist_RR=NULL;
-
-double* ptoMarking_LL=NULL;
-double* ptoMarking_ML=NULL;
-double* ptoMarking_MR=NULL;
-double* ptoMarking_RR=NULL;
 
 int count=0;
 ////////////////// added by lidong (end)
@@ -694,38 +632,6 @@ ReOneStep(double deltaTimeIncrement)
 {
 
 	//////////////// added by lidong (start)
-	if (psteerCmd==NULL) {
-        psteerCmd=psteerCmd_ghost;
-        paccelCmd=paccelCmd_ghost;
-        pbrakeCmd=pbrakeCmd_ghost;
-
-        pspeed=pspeed_ghost;
-        ptoMiddle=ptoMiddle_ghost;
-        pangle=pangle_ghost;
-
-        pfast=pfast_ghost;
-
-        pdist_L=pdist_L_ghost;
-        pdist_R=pdist_R_ghost;
-
-        ptoMarking_L=ptoMarking_L_ghost;
-        ptoMarking_M=ptoMarking_M_ghost;
-        ptoMarking_R=ptoMarking_R_ghost;
-
-        pdist_LL=pdist_LL_ghost;
-        pdist_MM=pdist_MM_ghost;
-        pdist_RR=pdist_RR_ghost;
-
-        ptoMarking_LL=ptoMarking_LL_ghost;
-        ptoMarking_ML=ptoMarking_ML_ghost;
-        ptoMarking_MR=ptoMarking_MR_ghost;
-        ptoMarking_RR=ptoMarking_RR_ghost;
-    }
-
- //    if (*pzmq_flag == 1) {
-	// 	socket.bind("tcp://*:5555");
-	// 	*pzmq_flag = 1 - *pzmq_flag;
-	// }
 
 	if (*ppause == 1) 
      { 
@@ -738,55 +644,11 @@ ReOneStep(double deltaTimeIncrement)
            // printf("Read pixles complete, now set pwritten = 1\n");
 
            *pwritten=1;
-           // printf("pwritten = %d\n", *pwritten);
 
            while (*pwritten == 1){
            		usleep(1);
-           		//printf("---- in loop pwritten = %d\n", *pwritten);
            }
 
-           
-           // for (int h = 0; h < image_height; h++) {
-           // 		for (int w = 0; w < image_width; w++) {
-           // 			image[(h*image_width+w)*3+0] =pdata[((image_height-h-1) * image_width + w)*3 + 0];
-           // 			image[(h*image_width+w)*3+1] =pdata[((image_height-h-1) * image_width + w)*3 + 1];
-           // 			image[(h*image_width+w)*3+2] =pdata[((image_height-h-1) * image_width + w)*3 + 2]; 
-           // 		}
-           // }
-
-           // // std::cout << "---steer_angle = " << *psteer_angle << std::endl;
-           
-           // torcs_data.clear_width();
-           // torcs_data.clear_height();
-           // torcs_data.clear_image();
-           // torcs_data.clear_save_flag();
-           // //torcs_data.clear_steer_angle();
-           // torcs_data.add_image((const void*)image, (size_t) image_width * image_height * 3);
-           // torcs_data.add_width(image_width);
-           // torcs_data.add_height(image_height);
-           // torcs_data.add_save_flag(*psave_flag);
-           // // torcs_data.add_steer_angle(*psteer_angle);
-           // std::cout << "torcs_data shape: [" << torcs_data.width(0) << ", " << torcs_data.height(0) << "]" << std::endl;
-
-           // std::string serialized_data;
-           // torcs_data.SerializeToString(&serialized_data);
-           // std::cout << "checked OK!  1" << std::endl;
-
-           	 
-           // zmq::message_t request;
-           // socket.recv(&request);
-           // std::string replyMessage = std::string(static_cast<char *>(request.data()), request.size());
-           // std::cout << "Recived from client: " + replyMessage << std::endl;
-
-           // zmq::message_t reply(serialized_data.size());
-           // // std::cout << "checked OK!  2" << std::endl;
-           // memcpy((void*) reply.data(), serialized_data.data(), serialized_data.size());
-           // std::cout << "---length of message to client: " << reply.size() << std::endl;
-           // socket.send(reply);
-           // std::cout << "checked OK!  3" << std::endl;
-
-           // *psave_flag = 0;
- 
            double t = GfTimeClock();
            if ((t - ReInfo->_reCurTime) > 30*RCM_MAX_DT_SIMU)
                ReInfo->_reCurTime = t - RCM_MAX_DT_SIMU;

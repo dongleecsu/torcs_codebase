@@ -9,10 +9,8 @@
 // $ g++ IPC_command.cpp torcs_data.pb.cc -o IPC_command 
 //       `pkg-config --cflags --libs opencv protobuf libzmq`
 // 
-// Last modified: 2016-09-27: 20:30
 
 #include <iostream>
-//#include <termios.h>
 #include <unistd.h>
 #include <sys/shm.h>
 #include <stdlib.h>  
@@ -34,36 +32,9 @@ struct shared_use_st
 {  
     int written;
     unsigned char data[image_width*image_height*3];
-    // double steer_angle;
-    int control;
     int pause;
-    int zmq_flag;   //  added by lidong
-    int save_flag;  //  added by lidong
-    double fast;
-
-    double dist_L;
-    double dist_R;
-
-    double toMarking_L;
-    double toMarking_M;
-    double toMarking_R;
-
-    double dist_LL;
-    double dist_MM;
-    double dist_RR;
-
-    double toMarking_LL;
-    double toMarking_ML;
-    double toMarking_MR;
-    double toMarking_RR;
-
-    double toMiddle;
-    double angle;
-    double speed;
-
-    double steerCmd;
-    double accelCmd;
-    double brakeCmd;
+    int zmq_flag; 
+    int save_flag; 
 };
 
 int main(int argc, char const *argv[])
@@ -87,36 +58,10 @@ int main(int argc, char const *argv[])
 
     shared = (struct shared_use_st*)shm; 
     shared->written = 0;
-    shared->control = 0;
     shared->pause = 0;
-    shared->zmq_flag = 0;  //  added by lidong
+    shared->zmq_flag = 0;  
     shared->save_flag = 0;
-    //shared->steer_angle = 0.0;
-    shared->fast = 0.0;
 
-    shared->dist_L = 0.0;
-    shared->dist_R = 0.0;
-
-    shared->toMarking_L = 0.0;
-    shared->toMarking_M = 0.0;
-    shared->toMarking_R = 0.0;
-
-    shared->dist_LL = 0.0;
-    shared->dist_MM = 0.0;
-    shared->dist_RR = 0.0;
-
-    shared->toMarking_LL = 0.0;
-    shared->toMarking_ML = 0.0;
-    shared->toMarking_MR = 0.0;
-    shared->toMarking_RR = 0.0;
-
-    shared->toMiddle = 0.0;
-    shared->angle = 0.0;
-    shared->speed = 0.0;
-
-    shared->steerCmd = 0.0;
-    shared->accelCmd = 0.0;
-    shared->brakeCmd = 0.0;
 
     // Setup zmq
     static zmq::context_t context(1);
@@ -147,13 +92,13 @@ int main(int argc, char const *argv[])
             // printf("---screenRGB read complete.\n");
             // Resize image and send it to protobuf
             cvResize(screenRGB, resizeRGB);
-            for (int h = 0; h < resize_height; h++) {
-                for (int w = 0; w < resize_width; w++){
-                    image[(h*resize_width)*3+0] = resizeRGB->imageData[(h*resize_width+w)*3+2];
-                    image[(h*resize_width)*3+1] = resizeRGB->imageData[(h*resize_width+w)*3+1];
-                    image[(h*resize_width)*3+2] = resizeRGB->imageData[(h*resize_width+w)*3+0];
-                }
-            }
+            // for (int h = 0; h < resize_height; h++) {
+            //     for (int w = 0; w < resize_width; w++){
+            //         image[(h*resize_width)*3+0] = resizeRGB->imageData[(h*resize_width+w)*3+2];
+            //         image[(h*resize_width)*3+1] = resizeRGB->imageData[(h*resize_width+w)*3+1];
+            //         image[(h*resize_width)*3+2] = resizeRGB->imageData[(h*resize_width+w)*3+0];
+            //     }
+            // }
             // cvShowImage("Image from TORCS", resizeRGB);
             cvSplit(resizeRGB, out_blue, out_green, out_red, NULL);
 
@@ -164,14 +109,9 @@ int main(int argc, char const *argv[])
             torcs_data.clear_green();
             torcs_data.clear_blue();
             torcs_data.clear_save_flag();
-            torcs_data.clear_image();
-            //torcs_data.add_image((const void*)image, (size_t) resize_width * resize_height * 3);
-            //torcs_data.add_red((const void*)&channel[2], (size_t) resize_width * resize_height);
-            //torcs_data.add_green((const void*)&channel[1], (size_t) resize_width * resize_height);
             torcs_data.add_red((const void*)out_red->imageData, (size_t) resize_width * resize_height);
             torcs_data.add_green((const void*)out_green->imageData, (size_t) resize_width * resize_height);
             torcs_data.add_blue((const void*)out_blue->imageData, (size_t) resize_width * resize_height);
-            // torcs_data.add_image((const void*)resizeRGB, (size_t) resize_width * resize_height * 3);
             torcs_data.add_width(resize_width);
             torcs_data.add_height(resize_height);
             torcs_data.add_save_flag(shared->save_flag);
@@ -181,7 +121,6 @@ int main(int argc, char const *argv[])
 
             string serialized_data;
             torcs_data.SerializeToString(&serialized_data);
-            // std::cout << "checked OK!  1" << std::endl;
 
             zmq::message_t request;
             socket.recv(&request);
@@ -193,7 +132,6 @@ int main(int argc, char const *argv[])
             memcpy((void*) reply.data(), serialized_data.data(), serialized_data.size());
             std::cout << "---length of message to client: " << reply.size() << std::endl;
             socket.send(reply);
-            // std::cout << "checked OK!  3" << std::endl;
 
             shared->written=0;
         }
