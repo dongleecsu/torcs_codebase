@@ -16,7 +16,9 @@ while True:
     if (written == 1).all():
         img = np.fromstring(memory_value[1:], dtype = np.uint8)
         img = img.reshape(480, 640, 3)
-        cv2.imshow("Image from torcs", img)
+        res = cv2.resize(img, (100, 100))
+        gray = cv2.cvtColor(res, cv2.COLOR_RGB2GRAY)
+        cv2.imshow("Image from torcs", gray)
         cv2.waitKey(10)
         memory.write("0", offset = 0) # actually write 48
     else:
