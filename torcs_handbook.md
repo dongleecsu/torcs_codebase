@@ -2,6 +2,22 @@ Torcs Handbook
 =====
 This file descrips some common torcs usages for _version=1.3.7_.
 
+**Installation**
+```shell
+cd torcs-1.3.7
+./configure
+make -j4
+sudo make install
+sudo make datainstall
+```
+
+**Unistall**
+```shell
+sudo rm -fr /usr/local/bin/torcs
+sudo rm -fr /usr/local/lib/torcs
+sudo rm -fr /usr/local/share/games/torcs
+```
+
 **Generate a robot**  
 First check the car types:
 ```shell
@@ -16,7 +32,9 @@ car1-stock1   car7-trb1  kc-conrero        kc-gt40       pw-imprezawrc
 car1-stock2   car8-trb1  kc-corvette-ttop  kc-gto
 car1-trb1     kc-2000gt  kc-daytona        kc-p4
 car1-trb3     kc-5300gt  kc-db4z           p406
-# go to TORCS_BASE and generate a bot
+```
+Go to TORCS_BASE and generate a bot.
+```shell
 $ cd torcs-1.3.7
 $ ./robotgen -n "drl_bot" -a "lidong" -c "car1-trb1" --gpl
 Generation of robot drl_bot author lidong
